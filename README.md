@@ -39,9 +39,9 @@ Para testar papéis: `LOCAL_USER=local-analista pnpm dev` (também `local-invest
 
 ## Rodar com Supabase (produção)
 
-1. Crie um projeto no Supabase e aplique `supabase/migrations/0001_schema.sql` (SQL Editor ou `supabase db push`).
-2. Crie a usuária no Auth e rode `supabase/seed.sql` ajustando o e-mail (cria grupo e papel ADMIN).
-3. Configure `.env.local` com `DATA_BACKEND=supabase`, `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+1. Crie um projeto no Supabase e aplique as migrações de `supabase/migrations/` na ordem (SQL Editor ou `supabase db push`).
+2. Em Authentication › Users, convide as usuárias por e-mail ("Invite user"). A primeira que for criada vira ADMIN do grupo padrão; as demais entram como VISUALIZACAO e a ADMIN define o papel em Configurações › Usuárias.
+3. Configure `.env.local` com `DATA_BACKEND=supabase`, `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` (chave publicável do projeto).
 4. `pnpm dev`. O perfil de investimento padrão é criado na primeira visita.
 
 Segurança: RLS por grupo em todas as tabelas, RBAC por papel nas políticas e nas server actions, auditoria por trigger, ledger append-only, segredos apenas no servidor.
