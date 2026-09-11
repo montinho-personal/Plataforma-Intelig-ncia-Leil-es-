@@ -14,13 +14,16 @@ P0 = sem isso o MVP não existe · P1 = Fase 1/2, alto valor · P2 = Fases 2/3 �
 - [x] Schema SQL (Supabase) com RLS, RBAC, auditoria por trigger, ledger append-only.
 - [x] App: autenticação (Supabase) + modo local para desenvolvimento.
 - [x] App: cadastro do imóvel; perfil de investimento; comparáveis; valuation; reforma; underwriting; cenários; lance máximo; memorando; home.
-- [ ] Importação CSV de imóveis e comparáveis com relatório de erros.
-- [ ] Registro de decisão e teto aprovado (versão imutável) na UI.
-- [ ] Testes e2e (Playwright) do fluxo cadastro → memorando.
-- [ ] Teste automatizado de isolamento RLS entre grupos.
+- [x] Importação CSV de comparáveis com relatório de erros por linha.
+- [ ] Importação CSV de imóveis.
+- [x] Registro de decisão e teto aprovado (versão imutável) na UI, com fricção (justificativa acima do máximo absoluto; reconhecimento de riscos críticos).
+- [x] Fumaça e2e (Playwright) do fluxo cadastro → comparáveis → reforma → underwriting → risco → decisão → teto (`tests/e2e/smoke.mjs`).
+- [x] Teste SQL de isolamento RLS, RBAC, auditoria e append-only (`tests/sql/rls_smoke.sql`).
+- [ ] Convite de usuárias por e-mail na própria aplicação (hoje: painel do Supabase Auth).
+- [ ] Versionamento persistido de valuation/underwriting (hoje: recalculado a partir dos dados; o memorando congela o snapshot na decisão).
 
 ## P1
-- [ ] Riscos manuais (lista curta) no memorando com critérios de "crítico".
+- [x] Riscos manuais (lista curta) com critério de crítico (P×I ≥ 15) refletidos no cabeçalho, memorando e aprovação do teto.
 - [ ] Extração de edital por IA com citação (página/trecho) e estados de extração.
 - [ ] Extração de matrícula por IA (ônus, proprietários, área, averbações).
 - [ ] Registro de decisão com votos e condições; teto aprovado com validade e versão.

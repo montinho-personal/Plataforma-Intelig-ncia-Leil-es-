@@ -1,5 +1,7 @@
 "use server";
 
+import { guarded } from "@/server/action-errors";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getRepository } from "@/data";
@@ -68,29 +70,35 @@ function parseProperty(fd: FormData): PropertyInput {
 }
 
 export async function createPropertyAction(fd: FormData) {
-  const user = await requirePermission("editProperty");
-  const repo = await getRepository();
-  const rec = await repo.createProperty(user.groupId, parseProperty(fd), user.id);
-  revalidatePath("/oportunidades");
-  redirect(`/oportunidades/${rec.id}/comparaveis`);
+  return guarded("/oportunidades/nova", async () => {
+    const user = await requirePermission("editProperty");
+    const repo = await getRepository();
+    const rec = await repo.createProperty(user.groupId, parseProperty(fd), user.id);
+    revalidatePath("/oportunidades");
+    redirect(`/oportunidades/${rec.id}/comparaveis`);
+  });
 }
 
 export async function updatePropertyAction(id: string, fd: FormData) {
-  const user = await requirePermission("editProperty");
-  const repo = await getRepository();
-  await repo.updateProperty(user.groupId, id, parseProperty(fd), user.id);
-  revalidatePath(`/oportunidades/${id}`);
-  redirect(`/oportunidades/${id}`);
+  return guarded(`/oportunidades/${id}/imovel`, async () => {
+    const user = await requirePermission("editProperty");
+    const repo = await getRepository();
+    await repo.updateProperty(user.groupId, id, parseProperty(fd), user.id);
+    revalidatePath(`/oportunidades/${id}`);
+    redirect(`/oportunidades/${id}`);
+  });
 }
 
 export async function setPropertyStatusAction(id: string, fd: FormData) {
-  const user = await requirePermission("editProperty");
-  const status = enumOf(fd, "status", STATUS);
-  if (!status) throw new Error("Status inválido");
-  const repo = await getRepository();
-  await repo.updateProperty(user.groupId, id, { status }, user.id);
-  revalidatePath(`/oportunidades/${id}`);
-  revalidatePath("/oportunidades");
+  return guarded(`/oportunidades/${id}`, async () => {
+    const user = await requirePermission("editProperty");
+    const status = enumOf(fd, "status", STATUS);
+    if (!status) throw new Error("Status inválido");
+    const repo = await getRepository();
+    await repo.updateProperty(user.groupId, id, { status }, user.id);
+    revalidatePath(`/oportunidades/${id}`);
+    revalidatePath("/oportunidades");
+  });
 }
 
 export async function toggleFavoriteAction(id: string, current: boolean) {

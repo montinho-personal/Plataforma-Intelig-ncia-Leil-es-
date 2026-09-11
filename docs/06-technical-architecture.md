@@ -4,7 +4,7 @@
 
 | Camada | Escolha | Por quê | Alternativa considerada |
 |---|---|---|---|
-| Frontend + BFF | **Next.js 15 (App Router) + React 19 + TypeScript** | Um único deploy, server components para telas densas de dados, server actions para mutações com validação no servidor; o time é pequeno e não precisa de dois repositórios | Remix, SvelteKit (menor ecossistema para o que precisamos), SPA + API separada (mais infra) |
+| Frontend + BFF | **Next.js 15.5 (App Router) + React 19 + TypeScript** | Um único deploy, server components para telas densas de dados, server actions para mutações com validação no servidor; o time é pequeno e não precisa de dois repositórios | Remix, SvelteKit (menor ecossistema para o que precisamos), SPA + API separada (mais infra) |
 | UI | **Tailwind CSS 3.4 + componentes próprios acessíveis (Radix primitives quando necessário)** | Controle total da estética "terminal financeiro"; sem template genérico | shadcn/ui (útil como referência, mas evitamos a estética padrão) |
 | Domínio | **Pacote puro em TypeScript (`src/domain`)** sem dependência de React ou banco | Toda fórmula financeira testável isoladamente; reutilizável em jobs, CLI e futuro app | Cálculo no banco (difícil de testar/versionar) |
 | Banco | **PostgreSQL (Supabase)** com RLS | Relacional, transacional, JSONB para snapshots, RLS por grupo no próprio banco, PITR | MongoDB (sem transações naturais para ledger), MySQL (RLS fraco) |
@@ -123,8 +123,9 @@ lucroLiquido   = lucroAntesTaxa − taxa
 
 ### 4.6 Métricas
 ```
-custoTotal      = capitalNecessario + custosVenda + ir + taxa + custoCapital
+custoTotal      = capitalNecessario + custosVenda + ir + taxa + juros        (caixa)
 lucroBruto      = V − capitalNecessario
+lucroEconomico  = lucroLiquido − custoCapital                              (custo de oportunidade, exibido à parte)
 ROI             = lucroLiquido / capitalProprio
 ROE             = ROI sem financiamento; com financiamento, lucroLiquido / capitalProprio (após juros)
 margem          = lucroLiquido / V

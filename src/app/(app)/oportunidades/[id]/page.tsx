@@ -65,7 +65,7 @@ export default async function SummaryPage({ params }: { params: Promise<{ id: st
             <Money cents={memo.referenceBid} />
           </Stat>
           <Stat label="Recomendação do sistema" tone={REC_TONE[memo.recommendation]}>
-            <span className="text-base">{memo.recommendation.replace(/_/g, " ")}</span>
+            <span className="text-base">{{ APROVAR: "APROVAR", APROVAR_COM_CONDICOES: "APROVAR COM CONDIÇÕES", REVISAR: "REVISAR", REPROVAR: "REPROVAR" }[memo.recommendation]}</span>
           </Stat>
         </div>
         {memo.maxBidBlocked && memo.maxBidBlockedReason && (

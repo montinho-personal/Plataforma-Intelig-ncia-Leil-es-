@@ -3,6 +3,7 @@ import { requireUser, can } from "@/server/auth";
 import { loadOpportunity, referenceBidFor } from "@/server/analysis";
 import { updateAnalysisSettingsAction } from "@/server/actions/analysis";
 import { btnGhost, Card, Epistemic, Field, Input, Money, Notice, Pct, Table } from "@/components/ui";
+import { formatBRL } from "@/domain/money";
 
 const GROUP_LABEL = { AQUISICAO: "Aquisição", OPERACAO: "Operação", VENDA: "Venda", TRIBUTOS: "Tributos", EQUIPE: "Equipe", CAPITAL: "Capital" } as const;
 
@@ -39,7 +40,7 @@ export default async function UnderwritingPage({ params }: { params: Promise<{ i
         <Notice tone="warn">Sem valuation: cadastre comparáveis para calcular o underwriting.</Notice>
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Card title={`Linhas de custo · lance ${(uw.input.bid / 100).toLocaleString("pt-BR")} · saída ${(uw.input.exitValue / 100).toLocaleString("pt-BR")} · ${uw.metrics.months} meses`} className="lg:col-span-2">
+          <Card title={`Linhas de custo · lance ${formatBRL(uw.input.bid)} · saída ${formatBRL(uw.input.exitValue)} · ${uw.metrics.months} meses`} className="lg:col-span-2">
             <Table>
               <tbody>
                 <tr className="font-medium">

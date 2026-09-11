@@ -4,6 +4,7 @@ import { loadOpportunity } from "@/server/analysis";
 import { setMaxBidOverrideAction } from "@/server/actions/analysis";
 import { btnGhost, Card, Field, Money, Notice, Pct, Table, Textarea } from "@/components/ui";
 import { bidImpact } from "@/domain/maxBid";
+import { formatBRL } from "@/domain/money";
 
 export default async function MaxBidPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -26,7 +27,7 @@ export default async function MaxBidPage({ params }: { params: Promise<{ id: str
     <div className="space-y-4">
       <Card
         title="Lance máximo — resolvido de trás para frente"
-        subtitle={`Base: VALOR DE SAÍDA em ${a.exitHorizonDays} dias (${(exit.amount / 100).toLocaleString("pt-BR")}; conservador ${(exit.low / 100).toLocaleString("pt-BR")}) · perfil: ROI alvo ${(profile.targetRoi * 100).toFixed(0)}% · ROI mínimo ${(profile.minRoi * 100).toFixed(0)}%${profile.minProfit ? ` · lucro mínimo ${(profile.minProfit / 100).toLocaleString("pt-BR")}` : ""}${profile.maxCapital ? ` · capital máximo ${(profile.maxCapital / 100).toLocaleString("pt-BR")}` : ""}${profile.minIrrAnnual ? ` · TIR mínima ${(profile.minIrrAnnual * 100).toFixed(0)}%` : ""}`}
+        subtitle={`Base: VALOR DE SAÍDA em ${a.exitHorizonDays} dias (${formatBRL(exit.amount)}; conservador ${formatBRL(exit.low)}) · perfil: ROI alvo ${(profile.targetRoi * 100).toFixed(0)}% · ROI mínimo ${(profile.minRoi * 100).toFixed(0)}%${profile.minProfit ? ` · lucro mínimo ${formatBRL(profile.minProfit)}` : ""}${profile.maxCapital ? ` · capital máximo ${formatBRL(profile.maxCapital)}` : ""}${profile.minIrrAnnual ? ` · TIR mínima ${(profile.minIrrAnnual * 100).toFixed(0)}%` : ""}`}
       >
         {mb.blocked ? (
           <Notice tone="bad">{mb.blockedReason}</Notice>

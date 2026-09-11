@@ -1,5 +1,6 @@
 import type { OpportunityContext } from "@/server/analysis";
 import type { RiskRecord } from "@/data/types";
+import { formatBRL } from "@/domain/money";
 
 export type MemoRecommendation = "APROVAR" | "APROVAR_COM_CONDICOES" | "REVISAR" | "REPROVAR";
 
@@ -80,7 +81,7 @@ export function buildMemo(ctx: OpportunityContext): Memo {
     const absolute = a.maxBid.byKey.ABSOLUTE_MAX.bid;
     if (ref > absolute) {
       recommendation = "REPROVAR";
-      why.push(`Lance de referência (${(ref / 100).toLocaleString("pt-BR")}) acima do máximo absoluto (${(absolute / 100).toLocaleString("pt-BR")}).`);
+      why.push(`Lance de referência (${formatBRL(ref)}) acima do máximo absoluto (${formatBRL(absolute)}).`);
     } else if (uw.roi !== null && uw.roi >= profile.targetRoi && level !== "CRITICO" && conditions.length <= 3) {
       recommendation = "APROVAR";
     } else if (uw.roi !== null && uw.roi >= profile.minRoi) {
@@ -100,7 +101,7 @@ export function buildMemo(ctx: OpportunityContext): Memo {
     why.push(`${a.valuation.stats.included} comparáveis incluídos, n efetivo ${a.valuation.stats.effectiveN.toFixed(1)}, dispersão ${(a.valuation.stats.coefficientOfVariation * 100).toFixed(0)}%, confiança ${a.valuation.confidence}%.`);
   }
   if (exit && a.valuation.marketValue) {
-    why.push(`Valor de saída em ${a.exitHorizonDays} dias (${(exit.amount / 100).toLocaleString("pt-BR")}) já desconta anúncio→fechamento, concessão do investidor e liquidez; o teto usa este valor, não o de mercado.`);
+    why.push(`Valor de saída em ${a.exitHorizonDays} dias (${formatBRL(exit.amount)}) já desconta anúncio→fechamento, concessão do investidor e liquidez; o teto usa este valor, não o de mercado.`);
   }
   if (property.auction?.appraisalValue) why.push("O valor de avaliação do edital foi ignorado no valuation (é referência do leilão, não de mercado).");
   if (uw) why.push(`Prazo total ${uw.months} meses (desocupação ${a.underwriting!.input.evictionMonths} m + obra + venda). TIR ${uw.irrAnnual === null ? "indefinida" : `${(uw.irrAnnual * 100).toFixed(0)}% a.a.`}.`);

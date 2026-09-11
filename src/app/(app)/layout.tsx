@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { Sidebar } from "@/components/sidebar";
+import { QueryNotice } from "@/components/query-notice";
 import { requireUser } from "@/server/auth";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +11,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen">
       <Sidebar user={user} />
       <main className="min-w-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl px-6 py-5">{children}</div>
+        <div className="mx-auto max-w-7xl px-6 py-5">
+          <Suspense fallback={null}>
+            <QueryNotice />
+          </Suspense>
+          {children}
+        </div>
       </main>
     </div>
   );

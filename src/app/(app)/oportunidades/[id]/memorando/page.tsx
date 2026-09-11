@@ -5,9 +5,11 @@ import { buildMemo } from "@/server/memo";
 import { approveCapAction, registerDecisionAction } from "@/server/actions/decisions";
 import { Badge, btnPrimary, Card, Disclosure, Field, Input, Money, Notice, Pct, Select, Table, Textarea } from "@/components/ui";
 import { RENOVATION_LEVEL_LABELS } from "@/domain/renovation";
+import { formatBRL } from "@/domain/money";
 import type { RenovationLevel } from "@/domain/types";
 
 const REC_TONE = { APROVAR: "ok", APROVAR_COM_CONDICOES: "warn", REVISAR: "accent", REPROVAR: "bad" } as const;
+const DECISION_LABEL = { APROVAR: "APROVAR", APROVAR_COM_CONDICOES: "APROVAR COM CONDIÇÕES", REVISAR: "REVISAR", REPROVAR: "REPROVAR" } as const;
 
 export default async function MemoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -64,7 +66,7 @@ export default async function MemoPage({ params }: { params: Promise<{ id: strin
         <div className="mt-4 flex items-center gap-3">
           <span className="text-xxs uppercase tracking-wider text-fg-faint">Recomendação do sistema</span>
           <Badge tone={REC_TONE[m.recommendation]} className="text-xs">
-            {m.recommendation.replace(/_/g, " ")}
+            {DECISION_LABEL[m.recommendation]}
           </Badge>
           <span className="text-xxs text-fg-faint">a decisão é das pessoas; o sistema sugere e registra</span>
         </div>
@@ -135,7 +137,7 @@ export default async function MemoPage({ params }: { params: Promise<{ id: strin
                   <tr key={d.id}>
                     <td className="font-mono">{d.version}</td>
                     <td>
-                      <Badge tone={REC_TONE[d.decision]}>{d.decision.replace(/_/g, " ")}</Badge>
+                      <Badge tone={REC_TONE[d.decision]}>{DECISION_LABEL[d.decision]}</Badge>
                     </td>
                     <td>{d.decidedByName}</td>
                     <td className="font-mono text-xxs">{new Date(d.decidedAt).toLocaleString("pt-BR")}</td>
@@ -159,7 +161,7 @@ export default async function MemoPage({ params }: { params: Promise<{ id: strin
               <Notice tone="warn">Lance máximo bloqueado ({a.valuation.status}). Resolva o valuation ou registre override justificado antes de aprovar o teto.</Notice>
             ) : (
               <form action={approveCapAction.bind(null, id)} className="space-y-2">
-                <Field label="Teto aprovado (R$)" hint={m.absoluteMaxBid !== null ? `sugestão: entre ideal ${(m.idealBid! / 100).toLocaleString("pt-BR")} e máximo absoluto ${(m.absoluteMaxBid / 100).toLocaleString("pt-BR")}; acima do absoluto exige justificativa` : undefined}>
+                <Field label="Teto aprovado (R$)" hint={m.absoluteMaxBid !== null ? `sugestão: entre ideal ${formatBRL(m.idealBid!)} e máximo absoluto ${formatBRL(m.absoluteMaxBid)}; acima do absoluto exige justificativa` : undefined}>
                   <Input name="approvedCap" inputMode="decimal" defaultValue={m.comfortableBid ? (m.comfortableBid / 100).toLocaleString("pt-BR") : ""} required />
                 </Field>
                 <Field label="Válido até">
