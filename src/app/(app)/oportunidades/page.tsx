@@ -28,7 +28,7 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
 
   return (
     <div className="space-y-4">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-base font-semibold">Radar</h1>
           <p className="text-xs text-fg-faint">{properties.length} imóvel(is). Ranking automático chega na Fase 4; aqui a triagem econômica já responde "merece análise?".</p>
@@ -40,9 +40,9 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
         )}
       </header>
 
-      <form className="flex flex-wrap items-end gap-2" method="get">
-        <Input name="q" placeholder="buscar título, rua, bairro, condomínio" defaultValue={sp.q ?? ""} className="w-64" />
-        <Select name="status" defaultValue={sp.status ?? ""} className="w-40">
+      <form className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-end" method="get">
+        <Input name="q" placeholder="buscar título, rua, bairro" defaultValue={sp.q ?? ""} className="col-span-2 sm:w-64" />
+        <Select name="status" defaultValue={sp.status ?? ""} className="sm:w-40">
           <option value="">status: todos</option>
           {["RADAR", "TRIAGEM", "EM_ANALISE", "APROVADO", "REPROVADO", "ARREMATADO", "ENCERRADO", "DESCARTADO"].map((s) => (
             <option key={s} value={s}>
@@ -50,7 +50,7 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
             </option>
           ))}
         </Select>
-        <Select name="type" defaultValue={sp.type ?? ""} className="w-40">
+        <Select name="type" defaultValue={sp.type ?? ""} className="sm:w-40">
           <option value="">tipo: todos</option>
           {["APARTAMENTO", "CASA", "TERRENO", "COMERCIAL", "RURAL", "OUTRO"].map((s) => (
             <option key={s} value={s}>
@@ -58,13 +58,13 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
             </option>
           ))}
         </Select>
-        <Select name="modality" defaultValue={sp.modality ?? ""} className="w-40">
+        <Select name="modality" defaultValue={sp.modality ?? ""} className="sm:w-40">
           <option value="">modalidade: todas</option>
           <option value="JUDICIAL">JUDICIAL</option>
           <option value="EXTRAJUDICIAL">EXTRAJUDICIAL</option>
         </Select>
-        <Input name="city" placeholder="cidade" defaultValue={sp.city ?? ""} className="w-32" />
-        <button className={btnGhost} type="submit">
+        <Input name="city" placeholder="cidade" defaultValue={sp.city ?? ""} className="sm:w-32" />
+        <button className={btnGhost + " col-span-2 justify-center sm:col-span-1"} type="submit">
           Filtrar
         </button>
       </form>
@@ -73,7 +73,7 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
         {properties.length === 0 ? (
           <p className="text-xs text-fg-muted">Nenhum imóvel. Cadastre manualmente ou importe CSV na tela de cadastro.</p>
         ) : (
-          <Table>
+          <Table className="hidden md:block">
             <thead>
               <tr>
                 <th>#</th>
@@ -154,7 +154,73 @@ export default async function OpportunitiesPage({ searchParams }: { searchParams
             </tbody>
           </Table>
         )}
+
+        {/* No celular a tabela densa fica ilegível: cada imóvel vira um cartão. */}
+        {properties.length > 0 && (
+          <ul className="divide-y divide-line md:hidden">
+            {contexts.map((ctx) => {
+              if (!ctx) return null;
+              const { property: p, analysis: a } = ctx;
+              const v = VERDICT[a.screening.verdict]!;
+              const bid = a.underwriting?.input.bid ?? p.auction?.secondCallMinBid ?? null;
+              return (
+                <li key={p.id} className="py-3 first:pt-0 last:pb-0">
+                  <Link href={`/oportunidades/${p.id}`} className="block space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-xxs text-fg-faint">#{p.code}</span>
+                          <span className="truncate text-xs text-fg">
+                            {p.isFavorite ? "★ " : ""}
+                            {p.title}
+                          </span>
+                        </div>
+                        <div className="mt-0.5 truncate text-xxs text-fg-faint">
+                          {p.neighborhood ? `${p.neighborhood} · ` : ""}
+                          {p.city} · {p.usableAreaM2} m²{p.bedrooms ? ` · ${p.bedrooms}q` : ""}
+                          {p.auction ? ` · ${p.auction.modality === "JUDICIAL" ? "judicial" : "extrajudicial"}` : ""}
+                          {p.auction?.secondCallAt ? ` · ${new Date(p.auction.secondCallAt).toLocaleDateString("pt-BR")}` : ""}
+                        </div>
+                      </div>
+                      <Badge tone={v.tone}>{v.label}</Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                      <Cell label="Lance ref.">
+                        <Money cents={bid} />
+                      </Cell>
+                      <Cell label={`Mercado ≈${a.valuation.marketValue ? (a.valuation.status === "OK" ? ` conf. ${a.valuation.confidence}%` : a.valuation.status === "ATYPICAL" ? " atípico" : " insuf.") : ""}`}>
+                        <Money cents={a.valuation.marketValue?.amount ?? null} />
+                      </Cell>
+                      <Cell label={`Saída ${a.exitHorizonDays} d`}>
+                        <Money cents={a.exitValue} />
+                      </Cell>
+                      <Cell label="ROI no lance ref.">
+                        <Pct value={a.underwriting?.metrics.roi ?? null} />
+                      </Cell>
+                      <Cell label="Teto (máx. absoluto)">
+                        {a.maxBid && !a.maxBid.blocked ? <Money cents={a.maxBid.byKey.ABSOLUTE_MAX.bid} /> : <span className="font-mono text-fg-faint">bloqueado</span>}
+                      </Cell>
+                      <Cell label="Status">
+                        <span className="font-mono text-xs text-fg-muted">{p.status.replace(/_/g, " ")}</span>
+                      </Cell>
+                    </div>
+                    {p.atypicalFlags.some((f) => f.severity === "CRITICAL") && <Badge tone="hot">caso atípico</Badge>}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </Card>
+    </div>
+  );
+}
+
+function Cell({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <div className="truncate text-xxs uppercase tracking-wider text-fg-faint">{label}</div>
+      <div className="font-mono text-sm tabular-nums">{children}</div>
     </div>
   );
 }

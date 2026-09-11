@@ -226,10 +226,10 @@ export default async function ComparablesPage({ params }: { params: Promise<{ id
               </div>
             </form>
           </Card>
-          <Disclosure summary="Importar CSV (fonte;preço;área;quartos;vagas;andar;idade;padrão;estado;localização;dias;url)">
+          <Disclosure summary="Importar comparáveis por CSV">
             <form action={importCsv} className="space-y-2">
               <Textarea name="csv" rows={6} placeholder={"fonte;preco;area;quartos;vagas;andar;idade;padrao;estado;localizacao;dias;url\nZAP;1290000;96;3;2;8;25;MEDIO;BOM;CONDO;30;https://..."} />
-              <p className="text-xxs text-fg-faint">Separador ; ou tabulação. Localização: CONDO, STREET, NEIGHBORHOOD ou OTHER. Linhas com erro são ignoradas e registradas.</p>
+              <p className="break-words text-xxs text-fg-faint">Colunas, nesta ordem: fonte, preço, área, quartos, vagas, andar, idade, padrão, estado, localização, dias anunciado, url. Separador ponto e vírgula ou tabulação. Localização aceita CONDO, STREET, NEIGHBORHOOD ou OTHER. Linhas com erro são ignoradas e relatadas.</p>
               <button className={btnGhost}>Importar</button>
             </form>
           </Disclosure>

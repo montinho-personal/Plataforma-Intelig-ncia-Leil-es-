@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AppShell } from "@/components/app-shell";
 import { Sidebar } from "@/components/sidebar";
 import { QueryNotice } from "@/components/query-notice";
 import { SetupNotice } from "@/components/setup-notice";
@@ -11,16 +12,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (dataBackend() === "local" && process.env.VERCEL) return <SetupNotice />;
   const user = await requireUser();
   return (
-    <div className="flex min-h-screen">
-      <Sidebar user={user} />
-      <main className="min-w-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl px-6 py-5">
-          <Suspense fallback={null}>
-            <QueryNotice />
-          </Suspense>
-          {children}
-        </div>
-      </main>
-    </div>
+    <AppShell sidebar={<Sidebar user={user} />} groupName={user.groupName}>
+      <Suspense fallback={null}>
+        <QueryNotice />
+      </Suspense>
+      {children}
+    </AppShell>
   );
 }

@@ -153,7 +153,7 @@ export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
 export function Disclosure({ summary, children, open = false }: { summary: ReactNode; children: ReactNode; open?: boolean }) {
   return (
     <details open={open} className="group rounded border border-line">
-      <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium text-fg-muted hover:text-fg">
+      <summary className="cursor-pointer select-none break-words px-3 py-2 text-xs font-medium text-fg-muted hover:text-fg">
         <span className="mr-2 inline-block text-fg-faint transition-transform group-open:rotate-90">▸</span>
         {summary}
       </summary>

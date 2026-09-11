@@ -77,7 +77,7 @@ export default async function HomePage() {
         ) : (
           <ul className="divide-y divide-line">
             {items.map((it, i) => (
-              <li key={i} className="flex items-center justify-between gap-3 py-2">
+              <li key={i} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2">
                 <div className="flex items-center gap-2 text-xs">
                   <span className={{ ok: "bg-ok", warn: "bg-warn", hot: "bg-hot", bad: "bg-bad", accent: "bg-accent" }[it.tone] + " h-1.5 w-1.5 rounded-full"} />
                   {it.text}

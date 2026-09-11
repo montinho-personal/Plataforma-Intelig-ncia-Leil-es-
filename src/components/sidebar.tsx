@@ -44,7 +44,7 @@ const NAV: { title: string; items: { href: string; label: string; phase?: string
 
 export function Sidebar({ user }: { user: CurrentUser }) {
   return (
-    <aside className="flex h-screen w-56 shrink-0 flex-col border-r border-line bg-bg-raised">
+    <aside className="flex h-full w-56 shrink-0 flex-col border-r border-line bg-bg-raised">
       <div className="border-b border-line px-4 py-3">
         <div className="font-mono text-xs font-semibold uppercase tracking-widest">Leilão OS</div>
         <div className="mt-0.5 truncate text-xxs text-fg-faint">{user.groupName}</div>
