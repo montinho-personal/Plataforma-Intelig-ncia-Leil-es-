@@ -2,14 +2,25 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { getRepository } from "@/data";
 import type { CurrentUser, MemberRole } from "@/data/types";
+import { NoMembershipError } from "@/data/errors";
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const repo = await getRepository();
   return repo.getCurrentUser();
 }
 
+/**
+ * Sessão obrigatória. Sem sessão → /login. Com sessão mas sem grupo acessível → /sem-acesso
+ * (nunca redirecionar para /login com sessão ativa: o middleware devolveria para / e criaria um loop).
+ */
 export async function requireUser(): Promise<CurrentUser> {
-  const user = await getCurrentUser();
+  let user: CurrentUser | null;
+  try {
+    user = await getCurrentUser();
+  } catch (e) {
+    if (e instanceof NoMembershipError) redirect(`/sem-acesso?detail=${encodeURIComponent(e.detail)}`);
+    throw e;
+  }
   if (!user) redirect("/login");
   return user;
 }

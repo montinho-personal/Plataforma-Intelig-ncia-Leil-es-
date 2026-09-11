@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { DEFAULT_PROFILE } from "@/domain/profile";
 import { detectAtypicalFlags } from "@/domain/valuation";
+import { NoMembershipError } from "./errors";
 import type { PropertyFilters, Repository } from "./repository";
 import type {
   AnalysisSettings,
@@ -33,14 +34,15 @@ export class SupabaseRepository implements Repository {
   async getCurrentUser(): Promise<CurrentUser | null> {
     const { data } = await this.db.auth.getUser();
     if (!data.user) return null;
-    const { data: memberships } = await this.db
+    const { data: memberships, error } = await this.db
       .from("group_members")
       .select("group_id, role, groups(name), users:users!group_members_user_id_fkey(full_name)")
       .eq("user_id", data.user.id)
       .order("created_at")
       .limit(1);
+    if (error) throw new NoMembershipError(data.user.email ?? "", error.message);
     const m = memberships?.[0] as Row | undefined;
-    if (!m) return null;
+    if (!m) throw new NoMembershipError(data.user.email ?? "", "nenhum grupo associado a esta conta");
     return {
       id: data.user.id,
       email: data.user.email ?? "",
